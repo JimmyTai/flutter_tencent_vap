@@ -1,0 +1,29 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_tencent_vap (0.0.1):
+    - Flutter
+    - QGVAPlayer (= 1.0.14)
+  - QGVAPlayer (1.0.14)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_tencent_vap (from `.symlinks/plugins/flutter_tencent_vap/ios`)
+
+SPEC REPOS:
+  trunk:
+    - QGVAPlayer
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_tencent_vap:
+    :path: ".symlinks/plugins/flutter_tencent_vap/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  flutter_tencent_vap: a028478842f61c0c27756f4114c5a86bfc5ffad5
+  QGVAPlayer: 0a51485acfff953375eaab16fb52636f4c709480
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.11.2
