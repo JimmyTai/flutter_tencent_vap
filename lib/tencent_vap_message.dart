@@ -7,18 +7,21 @@ class PlayMessage {
   const PlayMessage({
     required this.type,
     required this.path,
+    required this.alignment,
     required this.contentMode,
     required this.repeat,
   });
 
   final PlayMessageType type;
   final String path;
+  final VapViewAlignment alignment;
   final VapViewContentMode contentMode;
   final int repeat;
 
   Map<String, dynamic> toMap() => {
         'resource_type': describeEnum(type),
         'path': path,
+        'alignment': describeEnum(alignment),
         'content_mode': describeEnum(contentMode),
         'repeat': repeat,
       };

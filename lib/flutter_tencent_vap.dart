@@ -10,6 +10,8 @@ import 'package:flutter_tencent_vap/tencent_vap_video_resource.dart';
 export 'tencent_vap_video_resource.dart';
 export 'tencent_vap_exception.dart';
 
+enum VapViewAlignment { top, center, bottom }
+
 enum VapViewContentMode { fill, contain, cover }
 
 enum VapControllerStatus { init, idle, playing, pause }
@@ -84,6 +86,7 @@ class VapController {
   /// Don't play video in initState. It should be play after UI laid out.
   Future<void> play({
     required VapVideoResource resource,
+    VapViewAlignment alignment = VapViewAlignment.center,
     VapViewContentMode contentMode = VapViewContentMode.cover,
     int repeat = 0,
   }) async {
@@ -98,6 +101,7 @@ class VapController {
             PlayMessage(
               type: PlayMessageType.asset,
               path: resource.path,
+              alignment: alignment,
               contentMode: contentMode,
               repeat: repeat,
             ).toMap());
@@ -107,6 +111,7 @@ class VapController {
             PlayMessage(
               type: PlayMessageType.file,
               path: resource.path,
+              alignment: alignment,
               contentMode: contentMode,
               repeat: repeat,
             ).toMap());
