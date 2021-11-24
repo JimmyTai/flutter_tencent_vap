@@ -1,9 +1,10 @@
 package io.jimmytai.flutter_tencent_vap
 
 import android.content.Context
+import android.os.Build
 import android.view.View
+import androidx.annotation.RequiresApi
 import com.tencent.qgame.animplayer.AnimConfig
-import com.tencent.qgame.animplayer.AnimView
 import com.tencent.qgame.animplayer.inter.IAnimListener
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -15,6 +16,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 
+
 enum class TencentVapStatus {
     Idle, Playing, Pause
 }
@@ -24,7 +26,7 @@ enum class TencentVapContentMode {
 }
 
 class TencentVapView(val binaryMessenger: BinaryMessenger, val context: Context, id: Int, creationParams: Map<String?, Any?>?) : PlatformView, MethodChannel.MethodCallHandler, IAnimListener {
-    private val vapView: AnimView = AnimView(context)
+    private val vapView: VapView = VapView(context)
     private var channel: MethodChannel = MethodChannel(binaryMessenger, "flutter_tencent_vap_$id")
 
     private var playerStatus: TencentVapStatus = TencentVapStatus.Idle
@@ -41,9 +43,10 @@ class TencentVapView(val binaryMessenger: BinaryMessenger, val context: Context,
             "play" -> {
                 val type: String = params["resource_type"] as String
                 val path: String = params["path"] as String
+                val alignment: String = params["alignment"] as String
                 val contentMode: String = params["content_mode"] as String
                 val repeatCount: Int = (params["repeat"] as Int) + 1
-                play(type = type, path = path, contentMode = FlutterTencentVapUtils.parseContentMode(contentMode), repeatCount = repeatCount, result = result)
+                play(type = type, path = path, alignment = FlutterTencentVapUtils.parseVapViewAlignment(alignment), contentMode = FlutterTencentVapUtils.parseContentMode(contentMode), repeatCount = repeatCount, result = result)
             }
             "stop" -> {
                 stop()
@@ -51,7 +54,7 @@ class TencentVapView(val binaryMessenger: BinaryMessenger, val context: Context,
         }
     }
 
-    private fun play(type: String, path: String, contentMode: TencentVapContentMode, repeatCount: Int, result: MethodChannel.Result) {
+    private fun play(type: String, path: String, alignment: VapViewAlignment, contentMode: TencentVapContentMode, repeatCount: Int, result: MethodChannel.Result) {
         if (type != "asset" && type != "file") {
             uiThread {
                 result.error("unsupported_resource_type", "Please use asset or file type", null)
@@ -66,7 +69,7 @@ class TencentVapView(val binaryMessenger: BinaryMessenger, val context: Context,
         }
         playerStatus = TencentVapStatus.Playing
         playResult = result
-
+        vapView.setAlignment(alignment)
         vapView.setScaleType(FlutterTencentVapUtils.convertContentModeToVap(contentMode))
         vapView.setLoop(repeatCount)
         if (type == "asset") {
@@ -80,6 +83,7 @@ class TencentVapView(val binaryMessenger: BinaryMessenger, val context: Context,
         vapView.stopPlay()
     }
 
+    @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     override fun getView(): View {
         return vapView
     }
