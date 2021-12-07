@@ -9,6 +9,7 @@ import io.flutter.plugin.platform.PlatformViewFactory
 class TencentVapViewFactory(private val binaryMessenger: BinaryMessenger) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
+        @Suppress("UNCHECKED_CAST")
         val creationParams = args as Map<String?, Any?>?
         return TencentVapView(binaryMessenger = binaryMessenger, context = context, id = viewId, creationParams = creationParams)
     }

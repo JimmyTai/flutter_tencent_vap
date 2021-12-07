@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   void _onTapPlay01() {
     _controller01.play(
       resource: AssetVapVideoResource("assets/anim/halloween.mp4"),
+      alignment: VapViewAlignment.top,
       contentMode: VapViewContentMode.cover,
     );
   }

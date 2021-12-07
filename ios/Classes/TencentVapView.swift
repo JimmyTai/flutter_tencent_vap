@@ -9,6 +9,12 @@ enum TencentVapStatus {
   case pause
 }
 
+enum TencentVapAlignment {
+  case top
+  case center
+  case bottom
+}
+
 enum TencentVapContentMode {
   case fill
   case contain
@@ -39,6 +45,7 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
   private var rootView: UIView
   
   private var vapView: QGVAPWrapView?
+  private var alignment: TencentVapAlignment?
   private var contentMode: TencentVapContentMode?
   
   private var playerStatus: TencentVapStatus = .idle
@@ -63,13 +70,14 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
       
       let type: String? = params?["resource_type"] as? String
       let path: String? = params?["path"] as? String
+      let alignment: String? = params?["alignment"] as? String
       let contentMode: String? = params?["content_mode"] as? String
       let repeatCount: Int? = params?["repeat"] as? Int
-      if type == nil || path == nil || contentMode == nil || repeatCount == nil {
+      if type == nil || path == nil || alignment == nil || contentMode == nil || repeatCount == nil {
         result(FlutterError.init(code: "invalid_parameters", message: "Please check method channel parameters", details: nil))
         return
       }
-      play(type: type!, path: path!, contentMode: FlutterTencentVapUtils.parseContentMode(contentMode: contentMode!), repeatCount: repeatCount!, result: result)
+      play(type: type!, path: path!, alignment: FlutterTencentVapUtils.parseAlignment(alignment: alignment!), contentMode: FlutterTencentVapUtils.parseContentMode(contentMode: contentMode!), repeatCount: repeatCount!, result: result)
       break
     case "stop":
       stop()
@@ -85,7 +93,7 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
     }
   }
   
-  func play(type: String, path: String, contentMode: TencentVapContentMode, repeatCount: Int, result: @escaping FlutterResult) -> Void {
+  func play(type: String, path: String, alignment: TencentVapAlignment, contentMode: TencentVapContentMode, repeatCount: Int, result: @escaping FlutterResult) -> Void {
     var filePath: String?
     if type == "asset" {
       let assetPath: String = self.registrar.lookupKey(forAsset: path)
@@ -111,9 +119,10 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
     
     self.vapView = QGVAPWrapView.init(frame: self.rootView.bounds)
     self.rootView.addSubview(self.vapView!)
-    self.vapView!.center = self.rootView.center
+  
     self.vapView!.autoDestoryAfterFinish = true
     
+    self.alignment = alignment
     self.contentMode = contentMode
     
     self.vapView?.playHWDMP4(filePath!, repeatCount: repeatCount, delegate: self)
@@ -191,7 +200,7 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
       }
       
       view.frame = CGRect.init(x: 0, y: 0, width: realWidth, height: realHeight)
-      view.center = self.rootView.center
+      view.center = CGPoint(x: self.rootView.center.x, y: self.rootView.center.y - (realHeight - layoutHeight))
       break
     case .cover:
       if (layoutRatio > videoRatio) {
@@ -203,7 +212,18 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
       }
       
       view.frame = CGRect.init(x: 0, y: 0, width: realWidth, height: realHeight)
-      view.center = self.rootView.center
+
+      switch alignment ?? TencentVapAlignment.center {
+      case .top:
+        view.center = CGPoint(x: self.rootView.center.x, y: self.rootView.center.y + (realHeight - layoutHeight) / 2)
+        break
+      case .center:
+        view.center = self.rootView.center
+        break
+      case .bottom:
+        view.center = CGPoint(x: self.rootView.center.x, y: self.rootView.center.y - (realHeight - layoutHeight) / 2)
+        break
+      }
       break
     default:
       break
