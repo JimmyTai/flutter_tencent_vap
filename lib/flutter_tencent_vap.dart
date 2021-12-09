@@ -157,7 +157,9 @@ class VapView extends StatelessWidget {
   void _onPlatformViewCreated(int id) {
     controller._setViewId(id: id);
     controller._setStatus(status: VapControllerStatus.idle);
-    controller._initializeCompleter.complete();
+    if (!controller._initializeCompleter.isCompleted) {
+      controller._initializeCompleter.complete();
+    }
   }
 
   @override

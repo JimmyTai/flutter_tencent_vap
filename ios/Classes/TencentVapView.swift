@@ -55,6 +55,7 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
     self.registrar = registrar
     self.channel = FlutterMethodChannel.init(name: "flutter_tencent_vap_\(viewId)", binaryMessenger: self.registrar.messenger())
     self.rootView = UIView()
+    self.rootView.frame = frame
     self.rootView.clipsToBounds = true
     super.init()
     self.channel.setMethodCallHandler(methodCallHandler)
@@ -94,6 +95,7 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
   }
   
   func play(type: String, path: String, alignment: TencentVapAlignment, contentMode: TencentVapContentMode, repeatCount: Int, result: @escaping FlutterResult) -> Void {
+    print("[iOS][TencentVapView] play type: \(type)")
     var filePath: String?
     if type == "asset" {
       let assetPath: String = self.registrar.lookupKey(forAsset: path)
@@ -153,14 +155,14 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
   }
   
   func vapWrap_viewDidStartPlayMP4(_ container: UIView) {
-    //    print("[TencentVapView] start play mp4")
+    print("[TencentVapView] start play mp4")
     self.playResult?(true)
     self.playResult = nil
     self.channel.invokeMethod("player_status_on_start", arguments: nil)
   }
   
   func vapWrap_viewDidFailPlayMP4(_ error: Error) {
-    //    print("[TencentVapView] start play mp4 with error: \(error)")
+    print("[TencentVapView] start play mp4 with error: \(error)")
     self.playResult?(FlutterError.init(code: "play_fail", message: "VAP play fail with error: \(error)", details: nil))
     self.playerStatus = .idle
     self.playResult = nil
@@ -183,6 +185,8 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
     
     let layoutWidth: CGFloat = self.rootView.bounds.size.width
     let layoutHeight: CGFloat = self.rootView.bounds.size.height
+
+    print("layout width: \(layoutWidth), height: \(layoutHeight)")
     
     let layoutRatio: CGFloat = self.rootView.bounds.width / self.rootView.bounds.height
     let videoRatio: CGFloat = config.info.size.width / config.info.size.height
@@ -228,6 +232,7 @@ class TencentVapView: NSObject, FlutterPlatformView, VAPWrapViewDelegate {
     default:
       break
     }
+    print("real width: \(realWidth), height: \(realHeight)")
   }
   
   func view() -> UIView {
